@@ -13,14 +13,14 @@ float getRandomIncrementOf5() {
     static std::uniform_int_distribution<int> dis(0, 4); // 0 to 4 inclusive
 
     // Possible values: 10, 15, 20, 25, 30
-    return 10 + dis(gen) * 2;
+    return 8 + dis(gen) * 2;
 }
 
 
 sf::Vector2f gravity = {0, 1000};
 
 
-Ball ball(30);
+//Ball ball(30);
 Ball smallBall(8);
 // Small ball launch parameters
 sf::Vector2f launchPosition = {500.0f, 500.0f};
@@ -29,6 +29,10 @@ float launchSpeed = 300.0f;
 int numberOfSmallBalls = 700;
 bool smallBallLunchFlag = false;
 int k = 0;
+
+bool mouseBallFlag = false;
+Ball mouseBall(30);
+
 
 std::vector<Ball> balls;
 
@@ -60,6 +64,9 @@ void applyBorders(sf::RenderWindow& window) {
         sf::Vector2f& pos = ball.position_current;
         sf::Vector2f& old_pos = ball.position_old;
         float wallDamping = 0.7f; // Lose 30% energy on wall collision
+
+        // Ensure the shape origin is correct (center of circle)
+        ball.shape.setOrigin(sf::Vector2f(radius, radius));
 
         // X-axis
         if (pos.x - radius < 0) {
@@ -129,6 +136,11 @@ int main()
     sf::RenderWindow window(sf::VideoMode({1000, 1000}), "SFML works!");
     sf::Clock clock;
 
+    // Q - mouseBall
+    mouseBall.shape.setFillColor(sf::Color::Black);
+    //balls.push_back(mouseBall);
+
+
 
 
 
@@ -142,9 +154,11 @@ int main()
             if (event->is<sf::Event::Closed>())
                 window.close();
             if (event->is<sf::Event::MouseButtonPressed>()) {
-                ball.position_current = (sf::Vector2f(sf::Mouse::getPosition(window)));
-                ball.position_old = ball.position_current - sf::Vector2f(2.f, -2.f);
-                balls.push_back(ball);
+                smallBall.shape.setRadius(30);
+                smallBall.position_current = (sf::Vector2f(sf::Mouse::getPosition(window)));
+                smallBall.position_old = smallBall.position_current;
+                //ball.position_old = ball.position_current - sf::Vector2f(2.f, -2.f);
+                balls.push_back(smallBall);
             }
             if (event->is<sf::Event::KeyPressed>()) {
                 const sf::Event::KeyPressed* keyEvent = event->getIf<sf::Event::KeyPressed>();
@@ -163,12 +177,25 @@ int main()
                         case sf::Keyboard::Key::R:
                             smallBallLunchFlag = !smallBallLunchFlag;
                             break;
+                        case sf::Keyboard::Key::Q:
+                            if (mouseBallFlag) {
+                                if (!balls.empty()) {
+                                    balls.erase(balls.begin());
+                                }
+                            } else {
+
+                                balls.insert(balls.begin(), mouseBall);
+                            }
+
+                            mouseBallFlag = !mouseBallFlag;
+
                         default:
                             break;
                     }
                 }
             }
         }
+
         // SMALL BALL SPAWN (R)
         if (k < numberOfSmallBalls && smallBallLunchFlag) {
             // Set ball at launch position
@@ -189,6 +216,14 @@ int main()
             balls.push_back(smallBall);
             k++;
             std::cout << k << std::endl;
+        }
+
+        // MOUSE BALL (Q)
+
+        if (mouseBallFlag) {
+            balls[0].shape.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
+            balls[0].position_current = sf::Vector2f(sf::Mouse::getPosition(window));
+            balls[0].position_old = balls[0].position_current;
         }
 
         window.clear();
