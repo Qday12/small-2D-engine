@@ -10,6 +10,8 @@ pkg_check_modules(SFML REQUIRED sfml-all)
 add_executable(${PROJECT_NAME} main.cpp
         ball.cpp
         ball.h
+        EventHandler.h
+        Globals.h
 
 )
 
