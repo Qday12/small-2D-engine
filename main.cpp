@@ -16,6 +16,18 @@ float getRandomIncrementOf5() {
     return 8 + dis(gen) * 2;
 }
 
+// Returns a color from a smooth RGB gradient using a float value in range [0.0, 1.0]
+sf::Color getGradientColor(float t) {
+    // Clamp t to [0, 1]
+    t = std::max(0.f, std::min(1.f, t));
+
+    int r = static_cast<int>(std::sin(2 * M_PI * t + 0) * 127 + 128);
+    int g = static_cast<int>(std::sin(2 * M_PI * t + 2 * M_PI / 3) * 127 + 128);
+    int b = static_cast<int>(std::sin(2 * M_PI * t + 4 * M_PI / 3) * 127 + 128);
+
+    return sf::Color(r, g, b);
+}
+float collorStyle = 0.3f;
 
 sf::Vector2f gravity = {0, 1000};
 
@@ -135,10 +147,13 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode({1000, 1000}), "SFML works!");
     sf::Clock clock;
+    smallBall.shape.setOutlineThickness(1.f);
+    smallBall.shape.setOutlineColor(sf::Color::White);
+
 
     // Q - mouseBall
     mouseBall.shape.setFillColor(sf::Color::Black);
-    //balls.push_back(mouseBall);;
+
 
 
 
@@ -213,18 +228,20 @@ int main()
             launchDirection.x = oldX * 0.999848f - launchDirection.y * 0.017452f;
             launchDirection.y = oldX * 0.017452f + launchDirection.y * 0.999848f;
 
+            smallBall.shape.setFillColor(getGradientColor(collorStyle));
+            collorStyle += 0.001f;
             balls.push_back(smallBall);
             k++;
-            std::cout << k << std::endl;
+            //std::cout << k << std::endl;
         }
-
         // MOUSE BALL (Q)
-
         if (mouseBallFlag) {
             balls[0].shape.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
             balls[0].position_current = sf::Vector2f(sf::Mouse::getPosition(window));
             balls[0].position_old = balls[0].position_current;
         }
+
+
 
         window.clear();
         update(dt, window);
