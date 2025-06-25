@@ -17,7 +17,6 @@ float getRandomIncrementOf5() {
     // Possible values: 10, 15, 20, 25, 30
     return 8 + dis(gen) * 2;
 }
-
 // Returns a color from a smooth RGB gradient using a float value in range [0.0, 1.0]
 sf::Color getGradientColor(float t) {
     // Clamp t to [0, 1]
@@ -31,24 +30,28 @@ sf::Color getGradientColor(float t) {
 }
 float collorStyle = 0.3f;
 
-sf::Vector2f gravity = {0, 1000};
 
+
+sf::Vector2f gravity = {0, 1000};
 EventHandler eventHandler;
-//Ball ball(30);
-Ball smallBall(8);
+
+
 // Small ball launch parameters
+Ball smallBall(8);
 sf::Vector2f launchPosition = {500.0f, 500.0f};
 sf::Vector2f launchDirection = {1.0f, 0.0f}; // Start pointing right
 float launchSpeed = 300.0f;
-int numberOfSmallBalls = 700;
+int numberOfSmallBalls = 2000;
 bool smallBallLunchFlag = false;
 int k = 0;
-
+// Mouse Ball parameters
 bool mouseBallFlag = false;
 Ball mouseBall(30);
 
 
+// all balls vector
 std::vector<Ball> balls;
+
 
 
 
@@ -71,7 +74,6 @@ void updatePosition(float dt) {
 
     }
 }
-
 void applyBorders(sf::RenderWindow& window) {
     for (Ball& ball : balls) {
         float radius = ball.shape.getRadius();
@@ -103,6 +105,7 @@ void applyBorders(sf::RenderWindow& window) {
         ball.shape.setPosition(pos);
     }
 }
+
 
 void brutforceSolveColisions() {
     float collisionDamping = 0.95f; // Slight energy loss on collision
@@ -149,21 +152,35 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode({1000, 1000}), "SFML works!");
     sf::Clock clock;
+    //FPS counter
+    sf::Font font;
+    if (!font.openFromFile("../UniversCondensed.ttf")) {
+        std::cout << "Failed to load font!" << std::endl;
+        return -1;
+    }
+    sf::Text fpsText(font);
+    //fpsText.setString("FPS:");
+    fpsText.setCharacterSize(16);
+    fpsText.setFillColor(sf::Color::White);
+    fpsText.setPosition(sf::Vector2f(10, 10));
+
+
+
+    //R - smallBall
     smallBall.shape.setOutlineThickness(1.f);
     smallBall.shape.setOutlineColor(sf::Color::White);
-
 
     // Q - mouseBall
     mouseBall.shape.setFillColor(sf::Color::Black);
 
-
-
-
-
-
     while (window.isOpen())
     {
         float dt = clock.restart().asSeconds();
+        //FPS
+        float fps = 1.f / dt;
+        std::stringstream fpsStream;
+        fpsStream << std::fixed << std::setprecision(1) << fps;
+        fpsText.setString("FPS: " + fpsStream.str() + " Obj: " + std::to_string(balls.size()) );
 
         // handle events
         eventHandler.handleEvents(window);
@@ -203,6 +220,9 @@ int main()
         window.clear();
         update(dt, window);
         drawAll(window);
+        window.draw(fpsText);
         window.display();
+
+
     }
 }
