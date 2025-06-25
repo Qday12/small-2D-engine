@@ -7,6 +7,15 @@
 #include "ball.h"
 //test
 
+float getRandomIncrementOf5() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<int> dis(0, 4); // 0 to 4 inclusive
+
+    // Possible values: 10, 15, 20, 25, 30
+    return 10 + dis(gen) * 2;
+}
+
 
 sf::Vector2f gravity = {0, 1000};
 
@@ -167,7 +176,10 @@ int main()
             
             // Give ball initial velocity in the rotating direction
             smallBall.position_old = launchPosition - launchDirection * launchSpeed * dt;
-            smallBall.shape.setRadius(10);
+            
+            float newRadius = getRandomIncrementOf5();
+            smallBall.shape.setRadius(newRadius);
+            smallBall.shape.setOrigin(sf::Vector2f(newRadius, newRadius)); // Fix origin
             
             // Rotate the launch direction for next ball
             float oldX = launchDirection.x;
