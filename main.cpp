@@ -167,7 +167,7 @@ int main()
             
             // Give ball initial velocity in the rotating direction
             smallBall.position_old = launchPosition - launchDirection * launchSpeed * dt;
-            smallBall.shape.setRadius()
+            smallBall.shape.setRadius(10);
             
             // Rotate the launch direction for next ball
             float oldX = launchDirection.x;
